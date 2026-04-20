@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keystone Species & Trophic Cascades — Interactive Lesson</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    min-height: 100vh;
+    color: #0c4a6e;
+    padding-bottom: 40px;
+  }
+  .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+  header {
+    text-align: center;
+    padding: 22px 20px;
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    color: white;
+    border-radius: 15px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  header h1 { font-size: 2rem; margin-bottom: 6px; }
+  header p { font-size: 1rem; opacity: 0.95; }
+  .top-controls {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    gap: 8px;
+  }
+  .control-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 7px 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .control-btn:hover { background: rgba(255,255,255,0.35); }
+  .control-btn.active { background: #fbbf24; color: #78350f; border-color: #fbbf24; }
+
+  /* Nav tabs */
+  .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  .nav-tab {
+    padding: 11px 18px;
+    border: none;
+    background: #e0f2fe;
+    color: #0369a1;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 130px;
+  }
+  .nav-tab:hover { background: #bae6fd; }
+  .nav-tab.active { background: linear-gradient(135deg, #0369a1 0%, #075985 100%); color: white; }
+
+  /* Sections */
+  .section {
+    display: none;
+    background: white;
+    padding: 28px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 18px;
+  }
+  .section.active { display: block; }
+  .section h2 {
+    color: #075985;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #7dd3fc;
+    font-size: 1.6rem;
+  }
+  .section h3 { color: #0369a1; margin: 18px 0 10px; font-size: 1.2rem; }
+  .section p { margin-bottom: 12px; line-height: 1.65; color: #334155; font-size: 1.02rem; }
+  .section ul, .section ol { margin-left: 22px; margin-bottom: 12px; line-height: 1.7; color: #334155; }
+  .section ul li, .section ol li { margin-bottom: 6px; }
+
+  .vocab {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin: 12px 0;
+    cursor: help;
+    font-size: 0.95rem;
+  }
+  .vocab strong { color: #92400e; }
+
+  /* Photo gallery */
+  .photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin: 16px 0 20px;
+  }
+  .photo-card {
+    background: #f8fafc;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    border: 2px solid #e0f2fe;
+    transition: transform 0.2s;
+  }
+  .photo-card:hover { transform: translateY(-3px); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+  .photo-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-caption {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+    color: #334155;
+    line-height: 1.4;
+  }
+  .photo-caption strong { color: #075985; display: block; margin-bottom: 3px; font-size: 0.95rem; }
+  .photo-single {
+    max-width: 340px;
+    margin: 16px auto 20px;
+  }
+
+  .video-box {
+    background: #1e293b;
+    color: white;
+    padding: 16px;
+    border-radius: 10px;
+    margin: 14px 0;
+    text-align: center;
+  }
+  .video-box a {
+    color: #fbbf24;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  /* Ecosystem simulator */
+  .ecosystem {
+    background: linear-gradient(180deg, #bfdbfe 0%, #60a5fa 50%, #1e40af 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    position: relative;
+    min-height: 320px;
+  }
+  .ecosystem.tidal {
+    background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 50%, #1e3a8a 100%);
+  }
+  .food-web {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+  .trophic-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .species-card {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: center;
+    min-width: 120px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    transition: all 0.5s;
+    border: 3px solid transparent;
+  }
+  .species-card.crashed { opacity: 0.25; border-color: #dc2626; background: #fee2e2; }
+  .species-card.booming { border-color: #dc2626; background: #fef2f2; transform: scale(1.12); }
+  .species-card.healthy { border-color: #16a34a; }
+  .species-emoji { font-size: 2.6rem; display: block; margin-bottom: 4px; }
+  .species-name { font-weight: 700; color: #0c4a6e; font-size: 0.95rem; }
+  .species-role { font-size: 0.78rem; color: #64748b; font-style: italic; }
+  .pop-bar {
+    margin-top: 6px;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .pop-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+    transition: width 0.8s;
+  }
+  .pop-bar-fill.danger { background: linear-gradient(90deg, #dc2626, #f87171); }
+  .arrow {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .sim-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 14px 0;
+  }
+  .sim-btn {
+    padding: 11px 20px;
+    border: none;
+    border-radius: 9px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .sim-btn.reset { background: #16a34a; color: white; }
+  .sim-btn.reset:hover { background: #15803d; }
+  .sim-btn.remove { background: #dc2626; color: white; }
+  .sim-btn.remove:hover { background: #b91c1c; }
+  .sim-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .status-panel {
+    background: #f1f5f9;
+    border-left: 5px solid #0369a1;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+  .status-panel.danger { border-left-color: #dc2626; background: #fef2f2; }
+  .status-panel.good { border-left-color: #16a34a; background: #f0fdf4; }
+
+  /* Glossary panel */
+  .glossary-panel {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 340px;
+    max-height: 85vh;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    z-index: 1000;
+    overflow: hidden;
+  }
+  .glossary-panel.open { display: flex; flex-direction: column; }
+  .glossary-header {
+    background: #075985;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .glossary-header h3 { margin: 0; font-size: 1.1rem; }
+  .glossary-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.4rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .glossary-body {
+    overflow-y: auto;
+    padding: 12px 16px;
+  }
+  .glossary-item {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .glossary-item:last-child { border-bottom: none; }
+  .glossary-term { font-weight: 700; color: #075985; font-size: 0.98rem; }
+  .glossary-def { font-size: 0.88rem; color: #334155; margin-top: 2px; line-height: 1.5; }
+
+  /* Concept check */
+  .question-block {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+    border-left: 4px solid #0369a1;
+  }
+  .question-block .q-number {
+    font-weight: 700;
+    color: #075985;
+    margin-bottom: 8px;
+    font-size: 1.05rem;
+  }
+  .question-block .q-text {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #1e293b;
+    line-height: 1.5;
+  }
+  .choices { display: flex; flex-direction: column; gap: 7px; }
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .choice:hover { background: #e0f2fe; border-color: #7dd3fc; }
+  .choice.selected { background: #dbeafe; border-color: #3b82f6; }
+  .choice input { margin-top: 3px; cursor: pointer; }
+  .choice label { cursor: pointer; flex: 1; line-height: 1.45; color: #1e293b; font-size: 0.96rem; }
+
+  .essay-box {
+    width: 100%;
+    min-height: 180px;
+    padding: 12px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    resize: vertical;
+  }
+  .essay-box:focus { outline: none; border-color: #0369a1; }
+
+  .compile-section {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .compile-btn {
+    background: #065f46;
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  .compile-btn:hover { background: #064e3b; transform: translateY(-1px); }
+  .compile-btn.copy { background: #0369a1; }
+  .compile-btn.copy:hover { background: #075985; }
+  .output-box {
+    display: none;
+    background: white;
+    border: 2px solid #059669;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 14px;
+    text-align: left;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88rem;
+    max-height: 300px;
+    overflow-y: auto;
+    color: #111;
+  }
+  .copy-status {
+    display: inline-block;
+    margin-left: 10px;
+    color: #059669;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .footer-note {
+    text-align: center;
+    padding: 14px;
+    color: #475569;
+    font-size: 0.85rem;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 700px) {
+    header h1 { font-size: 1.4rem; }
+    .top-controls { position: static; justify-content: center; margin-top: 10px; }
+    .species-card { min-width: 90px; padding: 8px; }
+    .species-emoji { font-size: 2rem; }
+    .glossary-panel { width: calc(100% - 20px); right: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1 id="mainTitle">Keystone Species &amp; Trophic Cascades</h1>
+    <p id="mainSubtitle">10th Grade Biology — Interactive Lesson</p>
+    <div class="top-controls">
+      <button class="control-btn" id="langBtn" onclick="toggleLang()">Español</button>
+      <button class="control-btn" id="glossBtn" onclick="toggleGlossary()">📖 Glossary</button>
+    </div>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-section="intro" onclick="showSection('intro')" id="tabIntro">1. Introduction</button>
+    <button class="nav-tab" data-section="kelp" onclick="showSection('kelp')" id="tabKelp">2. Kelp Forest</button>
+    <button class="nav-tab" data-section="tidal" onclick="showSection('tidal')" id="tabTidal">3. Tidal Pool</button>
+    <button class="nav-tab" data-section="summary" onclick="showSection('summary')" id="tabSummary">4. Big Ideas</button>
+    <button class="nav-tab" data-section="check" onclick="showSection('check')" id="tabCheck">5. Check Your Understanding</button>
+  </div>
+
+  <!-- SECTION 1: INTRO -->
+  <div class="section active" id="intro">
+    <h2 data-i18n="introTitle">What Is a Keystone Species?</h2>
+    <p data-i18n="introP1">Imagine a stone archway. At the very top of the arch sits one special stone — the <strong>keystone</strong>. If you remove it, the whole arch falls apart. In ecosystems, some species work just like that keystone. They are not always the biggest or the most common animals, but if they disappear, the whole ecosystem can collapse.</p>
+    <p data-i18n="introP2">In this lesson, you will explore two real examples from the Pacific Ocean that scientists use to explain this idea: the <strong>kelp forests of the Aleutian Islands</strong> and the <strong>rocky tidal pools of the Pacific Northwest</strong>. Both stories come from a famous HHMI video about ecology.</p>
+
+    <div class="video-box">
+      <p data-i18n="videoPrompt">📺 Watch the HHMI video before or after this lesson:</p>
+      <a href="https://www.youtube.com/watch?v=hRGg5it5FMI" target="_blank">Some Animals Are More Equal than Others: Keystone Species and Trophic Cascades</a>
+    </div>
+
+    <h3 data-i18n="twoKeyIdeas">Two key ideas for this lesson:</h3>
+
+    <div class="vocab" onclick="highlightGlossary('Keystone species')">
+      <strong data-i18n="vocab1Term">Keystone Species:</strong>
+      <span data-i18n="vocab1Def"> A species that has a very large effect on its ecosystem, even if it is not very abundant. When it disappears, many other species are affected.</span>
+    </div>
+
+    <div class="vocab" onclick="highlightGlossary('Trophic cascade')">
+      <strong data-i18n="vocab2Term">Trophic Cascade:</strong>
+      <span data-i18n="vocab2Def"> A chain reaction in a food web. When a predator is added or removed at the top, it changes the populations below it — one level at a time — like dominoes falling.</span>
+    </div>
+
+    <p data-i18n="introP3">The word "trophic" means "related to feeding or food." So a <em>trophic cascade</em> is a cascade (waterfall) of effects through the feeding relationships of an ecosystem. Click over to the next tab to see your first example.</p>
+  </div>
+
+  <!-- SECTION 2: KELP FOREST -->
+  <div class="section" id="kelp">
+    <h2 data-i18n="kelpTitle">The Aleutian Kelp Forest</h2>
+    <p data-i18n="kelpP1">The Aleutian Islands are a cold, remote chain of islands off the coast of Alaska. Under the water, huge <strong>kelp forests</strong> grow — towering underwater plants that look like trees in a forest. These kelp forests are home to thousands of fish, crabs, and other animals.</p>
+    <p data-i18n="kelpP2">Here is the simple food chain of this ecosystem:</p>
+
+    <h3 data-i18n="meetSpecies">Meet the species:</h3>
+    <ul>
+      <li data-i18n="kelpSp1"><strong>Kelp</strong> — a giant seaweed and the main <em>producer</em> (makes its own food using sunlight).</li>
+      <li data-i18n="kelpSp2"><strong>Sea urchins</strong> — spiny animals that eat kelp. They are <em>herbivores</em>.</li>
+      <li data-i18n="kelpSp3"><strong>Sea otters</strong> — furry mammals that eat sea urchins. They are <em>predators</em> of urchins.</li>
+      <li data-i18n="kelpSp4"><strong>Killer whales (orcas)</strong> — usually hunt large prey in the open ocean, but something changed…</li>
+    </ul>
+
+    <div class="photo-gallery">
+      <div class="photo-card">
+        <img src="Kelp_Forest_off_of_Anacapa_Island_California.jpg" alt="Kelp forest underwater">
+        <div class="photo-caption">
+          <strong data-i18n="photoKelpTitle">Kelp Forest</strong>
+          <span data-i18n="photoKelpCap">Giant kelp growing off Anacapa Island, California. Tall kelp creates an underwater "forest" that shelters many species.</span>
+        </div>
+      </div>
+      <div class="photo-card">
+        <img src="Mother_sea_otter_with_rare_twin_baby_pups_(9137174915).jpg" alt="Mother sea otter with pups">
+        <div class="photo-caption">
+          <strong data-i18n="photoOtterTitle">Sea Otter</strong>
+          <span data-i18n="photoOtterCap">A mother sea otter with twin pups. Sea otters eat about 25% of their body weight in urchins and shellfish every day.</span>
+        </div>
+      </div>
+      <div class="photo-card">
+        <img src="Seaurchin_300.jpg" alt="Sea urchin">
+        <div class="photo-caption">
+          <strong data-i18n="photoUrchinTitle">Sea Urchin</strong>
+          <span data-i18n="photoUrchinCap">Spiny sea urchins graze on kelp. With no predators, they can strip a kelp forest down to bare rock.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 data-i18n="tryItTitle">🧪 Try it yourself: Remove the sea otters</h3>
+    <p data-i18n="kelpInstr">In the 1990s, scientists noticed killer whales started eating sea otters. What happened next? Use the button to find out.</p>
+
+    <div class="ecosystem">
+      <div class="food-web">
+        <div class="trophic-row">
+          <div class="species-card healthy" id="orcaCard">
+            <span class="species-emoji">🐋</span>
+            <div class="species-name" data-i18n="orca">Killer Whale</div>
+            <div class="species-role" data-i18n="apexPred">Apex predator</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="orcaBar" style="width: 80%"></div></div>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="trophic-row">
+          <div class="species-card healthy" id="otterCard">
+            <span class="species-emoji">🦦</span>
+            <div class="species-name" data-i18n="otter">Sea Otter</div>
+            <div class="species-role" data-i18n="keystoneLabel">Keystone species</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="otterBar" style="width: 85%"></div></div>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="trophic-row">
+          <div class="species-card healthy" id="urchinCard">
+            <span class="species-emoji">🟣</span>
+            <div class="species-name" data-i18n="urchin">Sea Urchin</div>
+            <div class="species-role" data-i18n="herbivore">Herbivore</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="urchinBar" style="width: 30%"></div></div>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="trophic-row">
+          <div class="species-card healthy" id="kelpCard">
+            <span class="species-emoji">🌿</span>
+            <div class="species-name" data-i18n="kelp">Kelp</div>
+            <div class="species-role" data-i18n="producer">Producer</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="kelpBar" style="width: 90%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-controls">
+      <button class="sim-btn remove" onclick="removeOtters()" id="removeOtterBtn" data-i18n="removeOtters">🚫 Remove Sea Otters</button>
+      <button class="sim-btn reset" onclick="resetKelp()" data-i18n="resetBtn">🔄 Reset Ecosystem</button>
+    </div>
+
+    <div class="status-panel good" id="kelpStatus">
+      <strong data-i18n="statusHealthy">Healthy ecosystem:</strong>
+      <span data-i18n="kelpStatusHealthy"> Sea otters eat sea urchins, which keeps urchin numbers low. With few urchins, the kelp forest grows thick and provides homes for many other species.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 3: TIDAL POOL -->
+  <div class="section" id="tidal">
+    <h2 data-i18n="tidalTitle">The Pacific Tidal Pool</h2>
+    <p data-i18n="tidalP1">Along the rocky shorelines of the Pacific Northwest, tidal pools fill with seawater when the tide rises and are exposed to air when the tide falls. These pools are packed with life: mussels, barnacles, snails, limpets, seaweeds, and — most importantly — <strong>sea stars</strong>.</p>
+    <p data-i18n="tidalP2">In the 1960s, scientist <strong>Dr. Robert Paine</strong> did one of the most famous experiments in ecology. He went out to tidal pools and physically removed all the <em>Pisaster</em> sea stars from one area. Then he watched what happened over many months.</p>
+
+    <h3 data-i18n="meetTidal">Meet the species:</h3>
+    <ul>
+      <li data-i18n="tidalSp1"><strong>Sea star (Pisaster)</strong> — a predator that eats mussels.</li>
+      <li data-i18n="tidalSp2"><strong>Mussels</strong> — shellfish that can grow in huge groups and take up lots of space on the rocks.</li>
+      <li data-i18n="tidalSp3"><strong>Barnacles, snails, limpets, seaweeds</strong> — the other tidal pool species that all compete for space on the rocks.</li>
+    </ul>
+
+    <div class="photo-single">
+      <div class="photo-card">
+        <img src="330px-Starfishmussel.jpg" alt="Pisaster sea star with mussels">
+        <div class="photo-caption">
+          <strong data-i18n="photoStarTitle">Pisaster Sea Star Eating Mussels</strong>
+          <span data-i18n="photoStarCap">A purple Pisaster sea star on a bed of mussels. Sea stars pry open mussel shells and digest them — keeping mussel populations in check so other species can survive.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 data-i18n="tryTidalTitle">🧪 Try it yourself: Remove the sea stars</h3>
+    <p data-i18n="tidalInstr">Click the button to repeat Dr. Paine's experiment.</p>
+
+    <div class="ecosystem tidal">
+      <div class="food-web">
+        <div class="trophic-row">
+          <div class="species-card healthy" id="starCard">
+            <span class="species-emoji">⭐</span>
+            <div class="species-name" data-i18n="star">Sea Star (Pisaster)</div>
+            <div class="species-role" data-i18n="keystoneLabel">Keystone species</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="starBar" style="width: 80%"></div></div>
+          </div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="trophic-row">
+          <div class="species-card healthy" id="musselCard">
+            <span class="species-emoji">🦪</span>
+            <div class="species-name" data-i18n="mussel">Mussels</div>
+            <div class="species-role" data-i18n="dominant">Dominant competitor</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="musselBar" style="width: 35%"></div></div>
+          </div>
+        </div>
+        <div class="trophic-row">
+          <div class="species-card healthy" id="barnacleCard">
+            <span class="species-emoji">🔺</span>
+            <div class="species-name" data-i18n="barnacle">Barnacles</div>
+            <div class="species-role" data-i18n="compete">Competes for space</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="barnacleBar" style="width: 70%"></div></div>
+          </div>
+          <div class="species-card healthy" id="snailCard">
+            <span class="species-emoji">🐌</span>
+            <div class="species-name" data-i18n="snail">Snails/Limpets</div>
+            <div class="species-role" data-i18n="compete">Competes for space</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="snailBar" style="width: 65%"></div></div>
+          </div>
+          <div class="species-card healthy" id="algaeCard">
+            <span class="species-emoji">🌱</span>
+            <div class="species-name" data-i18n="algae">Seaweed</div>
+            <div class="species-role" data-i18n="producer">Producer</div>
+            <div class="pop-bar"><div class="pop-bar-fill" id="algaeBar" style="width: 75%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-controls">
+      <button class="sim-btn remove" onclick="removeStars()" id="removeStarBtn" data-i18n="removeStars">🚫 Remove Sea Stars</button>
+      <button class="sim-btn reset" onclick="resetTidal()" data-i18n="resetBtn">🔄 Reset Ecosystem</button>
+    </div>
+
+    <div class="status-panel good" id="tidalStatus">
+      <strong data-i18n="statusHealthy">Healthy ecosystem:</strong>
+      <span data-i18n="tidalStatusHealthy"> Sea stars eat mussels and keep their numbers in check. This leaves room on the rocks for many other species to live. Biodiversity is high.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 4: SUMMARY -->
+  <div class="section" id="summary">
+    <h2 data-i18n="summaryTitle">Big Ideas to Remember</h2>
+
+    <h3 data-i18n="sum1">1. Keystone species are not always the biggest or most common.</h3>
+    <p data-i18n="sum1P">Sea otters are not huge. Sea stars are small compared to most ocean animals. But each one holds its ecosystem together. A keystone species is defined by its <strong>impact</strong>, not its size or population.</p>
+
+    <h3 data-i18n="sum2">2. Trophic cascades work top-down.</h3>
+    <p data-i18n="sum2P">When something happens at the top of the food chain, the effects cascade (flow) downward. Remove the predator → prey population booms → prey's food source crashes. You saw this with otters → urchins → kelp, and with sea stars → mussels → other species.</p>
+
+    <h3 data-i18n="sum3">3. Losing a keystone species reduces biodiversity.</h3>
+    <p data-i18n="sum3P"><strong>Biodiversity</strong> means the variety of living things in an ecosystem. When Dr. Paine removed sea stars, the number of species in the tidal pool dropped from about 15 to only a few. Mussels took over everything. Less variety = a weaker, less healthy ecosystem.</p>
+
+    <h3 data-i18n="sum4">4. Humans can start trophic cascades too.</h3>
+    <p data-i18n="sum4P">In the Aleutian Islands, one idea about why killer whales started eating sea otters is that their usual prey — large whales — had been overhunted by humans. When humans change one part of a food web, the effects can ripple out in unexpected ways.</p>
+
+    <div class="status-panel">
+      <strong data-i18n="takeaway">💡 Big takeaway:</strong>
+      <span data-i18n="takeawayText"> In nature, every species plays a role, but some species play a much bigger role than you might guess. Protecting keystone species protects whole ecosystems.</span>
+    </div>
+  </div>
+
+  <!-- SECTION 5: CONCEPT CHECK -->
+  <div class="section" id="check">
+    <h2 data-i18n="checkTitle">Check Your Understanding</h2>
+    <p data-i18n="checkIntro">Answer the 6 multiple-choice questions and write a short essay. When you are finished, use the <strong>Compile My Answers</strong> button at the bottom to combine everything into one block of text. Then use <strong>Copy to Clipboard</strong> and paste it into your Google Classroom document.</p>
+
+    <div id="questionsContainer"></div>
+
+    <div class="question-block">
+      <div class="q-number" data-i18n="essayLabel">Essay Question (challenging — take your time)</div>
+      <div class="q-text" data-i18n="essayText">Using what you learned about sea otters in the Aleutian Islands, explain how a trophic cascade works. In your answer: (1) describe the chain of events that happens when sea otter numbers drop — what happens to sea urchins, and what happens to the kelp forest. (2) Explain why sea otters are considered a keystone species. (3) Connect your answer to the idea of biodiversity: why does the kelp forest matter for other species living there? Write at least 5–7 complete sentences.</div>
+      <textarea class="essay-box" id="essayAnswer" placeholder="Type your essay response here..."></textarea>
+    </div>
+
+    <div class="question-block">
+      <div class="q-number" data-i18n="nameLabel">Your Name &amp; Class Period</div>
+      <input type="text" id="studentName" placeholder="First Last — Period #" style="width:100%; padding:10px; border:2px solid #cbd5e1; border-radius:8px; font-size:1rem;">
+    </div>
+
+    <div class="compile-section">
+      <h3 style="color:#065f46; margin-bottom:10px;" data-i18n="compileTitle">📋 Turn In Your Answers</h3>
+      <p style="color:#065f46; margin-bottom:12px;" data-i18n="compileInstr">Click below to gather all your answers, then copy them and paste into Google Classroom.</p>
+      <button class="compile-btn" onclick="compileAnswers()" data-i18n="compileBtn">📝 Compile My Answers</button>
+      <button class="compile-btn copy" onclick="copyAnswers()" data-i18n="copyBtn">📋 Copy to Clipboard</button>
+      <span class="copy-status" id="copyStatus"></span>
+      <div class="output-box" id="compiledOutput"></div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span data-i18n="footer">Interactive lesson based on HHMI BioInteractive "Some Animals Are More Equal than Others." Built for Ms./Mr. Nebbe's 10th grade biology class.</span>
+  </div>
+
+</div>
+
+<!-- GLOSSARY PANEL -->
+<div class="glossary-panel" id="glossaryPanel">
+  <div class="glossary-header">
+    <h3 data-i18n="glossaryTitle">Glossary</h3>
+    <button class="glossary-close" onclick="toggleGlossary()">✕</button>
+  </div>
+  <div class="glossary-body" id="glossaryBody"></div>
+</div>
+
+<script>
+// ==================== QUESTIONS ====================
+// Answer distribution: A, B, C, D, A, D (covers all four letters)
+const questions = [
+  {
+    q_en: "What is a keystone species?",
+    q_es: "¿Qué es una especie clave?",
+    choices_en: [
+      "A species that has a very large effect on its ecosystem, even when it is not very abundant",
+      "The biggest species in the ecosystem",
+      "The most common species in an ecosystem",
+      "A species that only lives on rocky shores"
+    ],
+    choices_es: [
+      "Una especie que tiene un efecto muy grande en su ecosistema, aunque no sea muy abundante",
+      "La especie más grande del ecosistema",
+      "La especie más común en un ecosistema",
+      "Una especie que solo vive en costas rocosas"
+    ],
+    correct: 0 // A
+  },
+  {
+    q_en: "In the kelp forest ecosystem, what happens when sea otters disappear?",
+    q_es: "En el ecosistema del bosque de algas, ¿qué sucede cuando las nutrias marinas desaparecen?",
+    choices_en: [
+      "Kelp grows faster because there are more nutrients in the water",
+      "Sea urchin populations grow out of control and destroy the kelp forests",
+      "Killer whales move to different oceans",
+      "Sea stars become the new top predator"
+    ],
+    choices_es: [
+      "Las algas crecen más rápido porque hay más nutrientes en el agua",
+      "Las poblaciones de erizos de mar crecen sin control y destruyen los bosques de algas",
+      "Las orcas se mudan a otros océanos",
+      "Las estrellas de mar se convierten en el nuevo depredador principal"
+    ],
+    correct: 1 // B
+  },
+  {
+    q_en: "According to the HHMI video, why did sea otter populations suddenly drop in the Aleutian Islands?",
+    q_es: "Según el video de HHMI, ¿por qué las poblaciones de nutrias marinas bajaron repentinamente en las Islas Aleutianas?",
+    choices_en: [
+      "A disease killed most of the otters",
+      "Water pollution from oil spills",
+      "Killer whales began hunting them",
+      "Climate change made the water too warm"
+    ],
+    choices_es: [
+      "Una enfermedad mató a la mayoría de las nutrias",
+      "Contaminación del agua por derrames de petróleo",
+      "Las orcas comenzaron a cazarlas",
+      "El cambio climático calentó demasiado el agua"
+    ],
+    correct: 2 // C
+  },
+  {
+    q_en: "A trophic cascade happens when…",
+    q_es: "Una cascada trófica ocurre cuando…",
+    choices_en: [
+      "Water flows downward through the ocean in layers",
+      "All species in an ecosystem die at the same time",
+      "A new species invades an ecosystem from far away",
+      "A change at one level of the food chain causes effects at other levels"
+    ],
+    choices_es: [
+      "El agua fluye hacia abajo a través del océano en capas",
+      "Todas las especies de un ecosistema mueren al mismo tiempo",
+      "Una especie nueva invade un ecosistema desde lejos",
+      "Un cambio en un nivel de la cadena alimenticia causa efectos en otros niveles"
+    ],
+    correct: 3 // D
+  },
+  {
+    q_en: "In Dr. Robert Paine's tidal pool experiment, what happened when he removed the Pisaster sea stars?",
+    q_es: "En el experimento de charcos de marea del Dr. Robert Paine, ¿qué sucedió cuando quitó las estrellas de mar Pisaster?",
+    choices_en: [
+      "Mussels took over the rocks and many other species disappeared",
+      "All species population sizes became equal",
+      "The tidal pools dried up permanently",
+      "Sea otters moved in to replace the sea stars"
+    ],
+    choices_es: [
+      "Los mejillones tomaron las rocas y muchas otras especies desaparecieron",
+      "Todos los tamaños de población de especies se igualaron",
+      "Los charcos de marea se secaron permanentemente",
+      "Las nutrias marinas se mudaron para reemplazar a las estrellas de mar"
+    ],
+    correct: 0 // A
+  },
+  {
+    q_en: "Why is it important to protect keystone species?",
+    q_es: "¿Por qué es importante proteger a las especies clave?",
+    choices_en: [
+      "They are the largest animals in the ecosystem",
+      "They produce most of the food that humans eat",
+      "They have the longest lifespans of any species",
+      "Losing them can cause an entire ecosystem to collapse"
+    ],
+    choices_es: [
+      "Son los animales más grandes del ecosistema",
+      "Producen la mayor parte de los alimentos que los humanos comen",
+      "Tienen las vidas más largas de todas las especies",
+      "Perderlas puede causar que todo un ecosistema colapse"
+    ],
+    correct: 3 // D
+  }
+];
+
+// ==================== GLOSSARY ====================
+const glossary = [
+  { term_en: "Keystone species", term_es: "Especie clave",
+    def_en: "A species that has a very large effect on its ecosystem, even if its population is small. Example: sea otters, sea stars.",
+    def_es: "Una especie que tiene un gran efecto en su ecosistema, aunque su población sea pequeña. Ejemplo: nutrias marinas, estrellas de mar." },
+  { term_en: "Trophic cascade", term_es: "Cascada trófica",
+    def_en: "A chain reaction of changes through a food web, usually starting when a top predator is added or removed.",
+    def_es: "Una reacción en cadena de cambios a través de una red alimenticia, generalmente cuando se agrega o se elimina un depredador principal." },
+  { term_en: "Producer", term_es: "Productor",
+    def_en: "An organism that makes its own food using sunlight (photosynthesis). Plants, algae, and kelp are producers.",
+    def_es: "Un organismo que produce su propio alimento usando la luz solar (fotosíntesis). Las plantas, algas y algas marinas son productores." },
+  { term_en: "Consumer", term_es: "Consumidor",
+    def_en: "An organism that eats other organisms for energy. Includes herbivores, carnivores, and omnivores.",
+    def_es: "Un organismo que come a otros organismos para obtener energía. Incluye herbívoros, carnívoros y omnívoros." },
+  { term_en: "Herbivore", term_es: "Herbívoro",
+    def_en: "An animal that eats only plants or algae. Example: sea urchins eating kelp.",
+    def_es: "Un animal que come solo plantas o algas. Ejemplo: erizos de mar comiendo algas." },
+  { term_en: "Predator", term_es: "Depredador",
+    def_en: "An animal that hunts and eats other animals (its prey).",
+    def_es: "Un animal que caza y come a otros animales (su presa)." },
+  { term_en: "Prey", term_es: "Presa",
+    def_en: "An animal that is hunted and eaten by a predator.",
+    def_es: "Un animal que es cazado y comido por un depredador." },
+  { term_en: "Apex predator", term_es: "Depredador tope",
+    def_en: "A predator at the top of the food chain, with no natural predators of its own. Example: killer whales.",
+    def_es: "Un depredador en la cima de la cadena alimenticia, sin depredadores naturales. Ejemplo: orcas." },
+  { term_en: "Food chain", term_es: "Cadena alimenticia",
+    def_en: "A single line of who eats whom: kelp → urchin → otter → orca.",
+    def_es: "Una línea única de quién come a quién: algas → erizo → nutria → orca." },
+  { term_en: "Food web", term_es: "Red alimenticia",
+    def_en: "All the feeding relationships in an ecosystem combined into a network.",
+    def_es: "Todas las relaciones alimenticias de un ecosistema combinadas en una red." },
+  { term_en: "Ecosystem", term_es: "Ecosistema",
+    def_en: "All the living things in an area plus the non-living parts they interact with (water, rocks, sunlight).",
+    def_es: "Todos los seres vivos de un área más las partes no vivas con las que interactúan (agua, rocas, luz solar)." },
+  { term_en: "Biodiversity", term_es: "Biodiversidad",
+    def_en: "The variety of different species living in one place. Higher biodiversity usually means a healthier ecosystem.",
+    def_es: "La variedad de diferentes especies que viven en un lugar. Mayor biodiversidad generalmente significa un ecosistema más saludable." },
+  { term_en: "Kelp forest", term_es: "Bosque de algas",
+    def_en: "An underwater habitat made of tall brown seaweed (kelp). Home to thousands of species.",
+    def_es: "Un hábitat submarino formado por algas marinas marrones altas. Hogar de miles de especies." },
+  { term_en: "Sea urchin barren", term_es: "Páramo de erizos",
+    def_en: "What happens when too many sea urchins eat away an entire kelp forest, leaving only bare rocks and urchins.",
+    def_es: "Lo que sucede cuando demasiados erizos de mar se comen todo un bosque de algas, dejando solo rocas desnudas y erizos." },
+  { term_en: "Tidal pool", term_es: "Charco de marea",
+    def_en: "A small pool of ocean water that forms in rocks along the shore at low tide.",
+    def_es: "Un pequeño charco de agua de mar que se forma en las rocas de la costa durante la marea baja." },
+  { term_en: "Pisaster", term_es: "Pisaster",
+    def_en: "The scientific name for the purple/orange sea star that Dr. Paine studied. A keystone species in Pacific tidal pools.",
+    def_es: "El nombre científico de la estrella de mar morada/naranja que estudió el Dr. Paine. Una especie clave en los charcos de marea del Pacífico." }
+];
+
+// ==================== TRANSLATIONS ====================
+const translations = {
+  en: {
+    mainTitle: "Keystone Species & Trophic Cascades",
+    mainSubtitle: "10th Grade Biology — Interactive Lesson",
+    tabIntro: "1. Introduction",
+    tabKelp: "2. Kelp Forest",
+    tabTidal: "3. Tidal Pool",
+    tabSummary: "4. Big Ideas",
+    tabCheck: "5. Check Your Understanding",
+    langBtn: "Español",
+    glossBtn: "📖 Glossary",
+    introTitle: "What Is a Keystone Species?",
+    introP1: "Imagine a stone archway. At the very top of the arch sits one special stone — the <strong>keystone</strong>. If you remove it, the whole arch falls apart. In ecosystems, some species work just like that keystone. They are not always the biggest or the most common animals, but if they disappear, the whole ecosystem can collapse.",
+    introP2: "In this lesson, you will explore two real examples from the Pacific Ocean that scientists use to explain this idea: the <strong>kelp forests of the Aleutian Islands</strong> and the <strong>rocky tidal pools of the Pacific Northwest</strong>. Both stories come from a famous HHMI video about ecology.",
+    videoPrompt: "📺 Watch the HHMI video before or after this lesson:",
+    twoKeyIdeas: "Two key ideas for this lesson:",
+    vocab1Term: "Keystone Species:",
+    vocab1Def: " A species that has a very large effect on its ecosystem, even if it is not very abundant. When it disappears, many other species are affected.",
+    vocab2Term: "Trophic Cascade:",
+    vocab2Def: " A chain reaction in a food web. When a predator is added or removed at the top, it changes the populations below it — one level at a time — like dominoes falling.",
+    introP3: "The word \"trophic\" means \"related to feeding or food.\" So a <em>trophic cascade</em> is a cascade (waterfall) of effects through the feeding relationships of an ecosystem. Click over to the next tab to see your first example.",
+    kelpTitle: "The Aleutian Kelp Forest",
+    kelpP1: "The Aleutian Islands are a cold, remote chain of islands off the coast of Alaska. Under the water, huge <strong>kelp forests</strong> grow — towering underwater plants that look like trees in a forest. These kelp forests are home to thousands of fish, crabs, and other animals.",
+    kelpP2: "Here is the simple food chain of this ecosystem:",
+    meetSpecies: "Meet the species:",
+    kelpSp1: "<strong>Kelp</strong> — a giant seaweed and the main <em>producer</em> (makes its own food using sunlight).",
+    kelpSp2: "<strong>Sea urchins</strong> — spiny animals that eat kelp. They are <em>herbivores</em>.",
+    kelpSp3: "<strong>Sea otters</strong> — furry mammals that eat sea urchins. They are <em>predators</em> of urchins.",
+    kelpSp4: "<strong>Killer whales (orcas)</strong> — usually hunt large prey in the open ocean, but something changed…",
+    photoKelpTitle: "Kelp Forest",
+    photoKelpCap: "Giant kelp growing off Anacapa Island, California. Tall kelp creates an underwater \"forest\" that shelters many species.",
+    photoOtterTitle: "Sea Otter",
+    photoOtterCap: "A mother sea otter with twin pups. Sea otters eat about 25% of their body weight in urchins and shellfish every day.",
+    photoUrchinTitle: "Sea Urchin",
+    photoUrchinCap: "Spiny sea urchins graze on kelp. With no predators, they can strip a kelp forest down to bare rock.",
+    photoStarTitle: "Pisaster Sea Star Eating Mussels",
+    photoStarCap: "A purple Pisaster sea star on a bed of mussels. Sea stars pry open mussel shells and digest them — keeping mussel populations in check so other species can survive.",
+    tryItTitle: "🧪 Try it yourself: Remove the sea otters",
+    kelpInstr: "In the 1990s, scientists noticed killer whales started eating sea otters. What happened next? Use the button to find out.",
+    orca: "Killer Whale",
+    apexPred: "Apex predator",
+    otter: "Sea Otter",
+    keystoneLabel: "Keystone species",
+    urchin: "Sea Urchin",
+    herbivore: "Herbivore",
+    kelp: "Kelp",
+    producer: "Producer",
+    removeOtters: "🚫 Remove Sea Otters",
+    resetBtn: "🔄 Reset Ecosystem",
+    statusHealthy: "Healthy ecosystem:",
+    kelpStatusHealthy: " Sea otters eat sea urchins, which keeps urchin numbers low. With few urchins, the kelp forest grows thick and provides homes for many other species.",
+    tidalTitle: "The Pacific Tidal Pool",
+    tidalP1: "Along the rocky shorelines of the Pacific Northwest, tidal pools fill with seawater when the tide rises and are exposed to air when the tide falls. These pools are packed with life: mussels, barnacles, snails, limpets, seaweeds, and — most importantly — <strong>sea stars</strong>.",
+    tidalP2: "In the 1960s, scientist <strong>Dr. Robert Paine</strong> did one of the most famous experiments in ecology. He went out to tidal pools and physically removed all the <em>Pisaster</em> sea stars from one area. Then he watched what happened over many months.",
+    meetTidal: "Meet the species:",
+    tidalSp1: "<strong>Sea star (Pisaster)</strong> — a predator that eats mussels.",
+    tidalSp2: "<strong>Mussels</strong> — shellfish that can grow in huge groups and take up lots of space on the rocks.",
+    tidalSp3: "<strong>Barnacles, snails, limpets, seaweeds</strong> — the other tidal pool species that all compete for space on the rocks.",
+    tryTidalTitle: "🧪 Try it yourself: Remove the sea stars",
+    tidalInstr: "Click the button to repeat Dr. Paine's experiment.",
+    star: "Sea Star (Pisaster)",
+    mussel: "Mussels",
+    dominant: "Dominant competitor",
+    barnacle: "Barnacles",
+    compete: "Competes for space",
+    snail: "Snails/Limpets",
+    algae: "Seaweed",
+    removeStars: "🚫 Remove Sea Stars",
+    tidalStatusHealthy: " Sea stars eat mussels and keep their numbers in check. This leaves room on the rocks for many other species to live. Biodiversity is high.",
+    summaryTitle: "Big Ideas to Remember",
+    sum1: "1. Keystone species are not always the biggest or most common.",
+    sum1P: "Sea otters are not huge. Sea stars are small compared to most ocean animals. But each one holds its ecosystem together. A keystone species is defined by its <strong>impact</strong>, not its size or population.",
+    sum2: "2. Trophic cascades work top-down.",
+    sum2P: "When something happens at the top of the food chain, the effects cascade (flow) downward. Remove the predator → prey population booms → prey's food source crashes. You saw this with otters → urchins → kelp, and with sea stars → mussels → other species.",
+    sum3: "3. Losing a keystone species reduces biodiversity.",
+    sum3P: "<strong>Biodiversity</strong> means the variety of living things in an ecosystem. When Dr. Paine removed sea stars, the number of species in the tidal pool dropped from about 15 to only a few. Mussels took over everything. Less variety = a weaker, less healthy ecosystem.",
+    sum4: "4. Humans can start trophic cascades too.",
+    sum4P: "In the Aleutian Islands, one idea about why killer whales started eating sea otters is that their usual prey — large whales — had been overhunted by humans. When humans change one part of a food web, the effects can ripple out in unexpected ways.",
+    takeaway: "💡 Big takeaway:",
+    takeawayText: " In nature, every species plays a role, but some species play a much bigger role than you might guess. Protecting keystone species protects whole ecosystems.",
+    checkTitle: "Check Your Understanding",
+    checkIntro: "Answer the 6 multiple-choice questions and write a short essay. When you are finished, use the <strong>Compile My Answers</strong> button at the bottom to combine everything into one block of text. Then use <strong>Copy to Clipboard</strong> and paste it into your Google Classroom document.",
+    essayLabel: "Essay Question (challenging — take your time)",
+    essayText: "Using what you learned about sea otters in the Aleutian Islands, explain how a trophic cascade works. In your answer: (1) describe the chain of events that happens when sea otter numbers drop — what happens to sea urchins, and what happens to the kelp forest. (2) Explain why sea otters are considered a keystone species. (3) Connect your answer to the idea of biodiversity: why does the kelp forest matter for other species living there? Write at least 5–7 complete sentences.",
+    nameLabel: "Your Name & Class Period",
+    compileTitle: "📋 Turn In Your Answers",
+    compileInstr: "Click below to gather all your answers, then copy them and paste into Google Classroom.",
+    compileBtn: "📝 Compile My Answers",
+    copyBtn: "📋 Copy to Clipboard",
+    glossaryTitle: "Glossary",
+    footer: "Interactive lesson based on HHMI BioInteractive \"Some Animals Are More Equal than Others.\" Built for Mr. Nebbe's 10th grade biology class."
+  },
+  es: {
+    mainTitle: "Especies Clave y Cascadas Tróficas",
+    mainSubtitle: "Biología de 10º Grado — Lección Interactiva",
+    tabIntro: "1. Introducción",
+    tabKelp: "2. Bosque de Algas",
+    tabTidal: "3. Charco de Marea",
+    tabSummary: "4. Ideas Principales",
+    tabCheck: "5. Revisa Tu Aprendizaje",
+    langBtn: "English",
+    glossBtn: "📖 Glosario",
+    introTitle: "¿Qué Es una Especie Clave?",
+    introP1: "Imagina un arco de piedra. En la parte más alta del arco hay una piedra especial — la <strong>piedra clave</strong>. Si la quitas, todo el arco se derrumba. En los ecosistemas, algunas especies funcionan igual que esa piedra clave. No siempre son los animales más grandes ni los más comunes, pero si desaparecen, todo el ecosistema puede colapsar.",
+    introP2: "En esta lección, explorarás dos ejemplos reales del Océano Pacífico que los científicos usan para explicar esta idea: los <strong>bosques de algas de las Islas Aleutianas</strong> y los <strong>charcos de marea rocosos del Pacífico Noroeste</strong>. Ambas historias vienen de un famoso video de HHMI sobre ecología.",
+    videoPrompt: "📺 Mira el video de HHMI antes o después de esta lección:",
+    twoKeyIdeas: "Dos ideas principales para esta lección:",
+    vocab1Term: "Especie Clave:",
+    vocab1Def: " Una especie que tiene un efecto muy grande en su ecosistema, aunque no sea muy abundante. Cuando desaparece, muchas otras especies se ven afectadas.",
+    vocab2Term: "Cascada Trófica:",
+    vocab2Def: " Una reacción en cadena en una red alimenticia. Cuando se agrega o se elimina un depredador en la parte superior, cambia las poblaciones debajo de él — un nivel a la vez — como fichas de dominó cayendo.",
+    introP3: "La palabra \"trófica\" significa \"relacionada con la alimentación o comida.\" Entonces una <em>cascada trófica</em> es una cascada (como una catarata) de efectos a través de las relaciones alimenticias de un ecosistema. Haz clic en la siguiente pestaña para ver tu primer ejemplo.",
+    kelpTitle: "El Bosque de Algas Aleutiano",
+    kelpP1: "Las Islas Aleutianas son una cadena de islas remotas y frías frente a la costa de Alaska. Bajo el agua crecen enormes <strong>bosques de algas</strong> — plantas submarinas altísimas que parecen árboles en un bosque. Estos bosques de algas son el hogar de miles de peces, cangrejos y otros animales.",
+    kelpP2: "Aquí está la cadena alimenticia simple de este ecosistema:",
+    meetSpecies: "Conoce las especies:",
+    kelpSp1: "<strong>Algas marinas (kelp)</strong> — algas gigantes y el <em>productor</em> principal (producen su propio alimento usando la luz solar).",
+    kelpSp2: "<strong>Erizos de mar</strong> — animales con espinas que comen algas. Son <em>herbívoros</em>.",
+    kelpSp3: "<strong>Nutrias marinas</strong> — mamíferos peludos que comen erizos de mar. Son <em>depredadores</em> de los erizos.",
+    kelpSp4: "<strong>Orcas (ballenas asesinas)</strong> — generalmente cazan presas grandes en el océano abierto, pero algo cambió…",
+    photoKelpTitle: "Bosque de Algas",
+    photoKelpCap: "Algas gigantes creciendo cerca de la Isla Anacapa, California. Las algas altas forman un \"bosque\" submarino que refugia a muchas especies.",
+    photoOtterTitle: "Nutria Marina",
+    photoOtterCap: "Una mamá nutria marina con crías gemelas. Las nutrias marinas comen aproximadamente el 25% de su peso corporal en erizos y mariscos cada día.",
+    photoUrchinTitle: "Erizo de Mar",
+    photoUrchinCap: "Los erizos de mar espinosos se alimentan de algas. Sin depredadores, pueden dejar un bosque de algas reducido a roca desnuda.",
+    photoStarTitle: "Estrella Pisaster Comiendo Mejillones",
+    photoStarCap: "Una estrella de mar Pisaster morada sobre una cama de mejillones. Las estrellas de mar abren las conchas de los mejillones y los digieren — manteniendo las poblaciones de mejillones controladas para que otras especies puedan sobrevivir.",
+    tryItTitle: "🧪 Pruébalo tú mismo: Quita las nutrias marinas",
+    kelpInstr: "En los años 1990, los científicos notaron que las orcas comenzaron a comer nutrias marinas. ¿Qué pasó después? Usa el botón para descubrirlo.",
+    orca: "Orca",
+    apexPred: "Depredador tope",
+    otter: "Nutria Marina",
+    keystoneLabel: "Especie clave",
+    urchin: "Erizo de Mar",
+    herbivore: "Herbívoro",
+    kelp: "Alga Marina",
+    producer: "Productor",
+    removeOtters: "🚫 Quitar las Nutrias",
+    resetBtn: "🔄 Reiniciar Ecosistema",
+    statusHealthy: "Ecosistema saludable:",
+    kelpStatusHealthy: " Las nutrias marinas comen erizos, lo que mantiene bajas sus poblaciones. Con pocos erizos, el bosque de algas crece denso y da hogar a muchas otras especies.",
+    tidalTitle: "El Charco de Marea del Pacífico",
+    tidalP1: "A lo largo de las costas rocosas del Pacífico Noroeste, los charcos de marea se llenan de agua de mar cuando sube la marea y quedan expuestos al aire cuando baja. Estos charcos están llenos de vida: mejillones, percebes, caracoles, lapas, algas, y — lo más importante — <strong>estrellas de mar</strong>.",
+    tidalP2: "En los años 1960, el científico <strong>Dr. Robert Paine</strong> hizo uno de los experimentos más famosos de la ecología. Fue a los charcos de marea y quitó físicamente todas las estrellas de mar <em>Pisaster</em> de una área. Luego observó lo que pasó durante muchos meses.",
+    meetTidal: "Conoce las especies:",
+    tidalSp1: "<strong>Estrella de mar (Pisaster)</strong> — un depredador que come mejillones.",
+    tidalSp2: "<strong>Mejillones</strong> — mariscos que pueden crecer en grupos enormes y ocupar mucho espacio en las rocas.",
+    tidalSp3: "<strong>Percebes, caracoles, lapas, algas</strong> — las otras especies del charco de marea que compiten por espacio en las rocas.",
+    tryTidalTitle: "🧪 Pruébalo tú mismo: Quita las estrellas de mar",
+    tidalInstr: "Haz clic en el botón para repetir el experimento del Dr. Paine.",
+    star: "Estrella de Mar (Pisaster)",
+    mussel: "Mejillones",
+    dominant: "Competidor dominante",
+    barnacle: "Percebes",
+    compete: "Compite por espacio",
+    snail: "Caracoles/Lapas",
+    algae: "Algas",
+    removeStars: "🚫 Quitar las Estrellas",
+    tidalStatusHealthy: " Las estrellas de mar comen mejillones y mantienen sus números controlados. Esto deja espacio en las rocas para que vivan muchas otras especies. La biodiversidad es alta.",
+    summaryTitle: "Ideas Principales Para Recordar",
+    sum1: "1. Las especies clave no siempre son las más grandes ni las más comunes.",
+    sum1P: "Las nutrias marinas no son enormes. Las estrellas de mar son pequeñas comparadas con la mayoría de los animales marinos. Pero cada una mantiene unido su ecosistema. Una especie clave se define por su <strong>impacto</strong>, no por su tamaño o población.",
+    sum2: "2. Las cascadas tróficas funcionan de arriba hacia abajo.",
+    sum2P: "Cuando pasa algo en la cima de la cadena alimenticia, los efectos bajan en cascada. Quitar al depredador → la población de presas explota → la fuente de alimento de la presa colapsa. Viste esto con nutrias → erizos → algas, y con estrellas → mejillones → otras especies.",
+    sum3: "3. Perder una especie clave reduce la biodiversidad.",
+    sum3P: "<strong>Biodiversidad</strong> significa la variedad de seres vivos en un ecosistema. Cuando el Dr. Paine quitó las estrellas de mar, el número de especies en el charco bajó de unos 15 a solo unas pocas. Los mejillones dominaron todo. Menos variedad = un ecosistema más débil y menos saludable.",
+    sum4: "4. Los humanos también pueden iniciar cascadas tróficas.",
+    sum4P: "En las Islas Aleutianas, una idea de por qué las orcas comenzaron a comer nutrias es que su presa habitual — las ballenas grandes — fueron cazadas en exceso por los humanos. Cuando los humanos cambian una parte de una red alimenticia, los efectos pueden extenderse de maneras inesperadas.",
+    takeaway: "💡 Idea principal:",
+    takeawayText: " En la naturaleza, cada especie tiene un papel, pero algunas especies tienen un papel mucho mayor de lo que podrías pensar. Proteger a las especies clave protege a ecosistemas enteros.",
+    checkTitle: "Revisa Tu Aprendizaje",
+    checkIntro: "Responde las 6 preguntas de opción múltiple y escribe un ensayo corto. Cuando termines, usa el botón <strong>Compilar Mis Respuestas</strong> al final para combinar todo en un bloque de texto. Luego usa <strong>Copiar al Portapapeles</strong> y pégalo en tu documento de Google Classroom.",
+    essayLabel: "Pregunta de Ensayo (desafiante — tómate tu tiempo)",
+    essayText: "Usando lo que aprendiste sobre las nutrias marinas en las Islas Aleutianas, explica cómo funciona una cascada trófica. En tu respuesta: (1) describe la cadena de eventos que pasa cuando los números de nutrias bajan — qué les pasa a los erizos de mar, y qué le pasa al bosque de algas. (2) Explica por qué las nutrias marinas se consideran una especie clave. (3) Conecta tu respuesta con la idea de biodiversidad: ¿por qué importa el bosque de algas para otras especies que viven allí? Escribe al menos 5–7 oraciones completas.",
+    nameLabel: "Tu Nombre y Período de Clase",
+    compileTitle: "📋 Entrega Tus Respuestas",
+    compileInstr: "Haz clic abajo para reunir todas tus respuestas, luego cópialas y pégalas en Google Classroom.",
+    compileBtn: "📝 Compilar Mis Respuestas",
+    copyBtn: "📋 Copiar al Portapapeles",
+    glossaryTitle: "Glosario",
+    footer: "Lección interactiva basada en HHMI BioInteractive \"Algunos Animales Son Más Iguales que Otros.\" Hecha para la clase de biología de 10º grado del Sr. Nebbe."
+  }
+};
+
+// ==================== STATE ====================
+let currentLang = 'en';
+let studentAnswers = {}; // question index -> choice index
+
+// ==================== INITIALIZATION ====================
+function init() {
+  renderQuestions();
+  renderGlossary();
+  applyLanguage();
+}
+
+// ==================== SECTION SWITCHING ====================
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector('.nav-tab[data-section="' + id + '"]').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==================== KELP FOREST SIMULATOR ====================
+function removeOtters() {
+  setBar('otterBar', 0, true);
+  document.getElementById('otterCard').classList.remove('healthy');
+  document.getElementById('otterCard').classList.add('crashed');
+  setTimeout(() => {
+    setBar('urchinBar', 95, true);
+    document.getElementById('urchinCard').classList.remove('healthy');
+    document.getElementById('urchinCard').classList.add('booming');
+  }, 700);
+  setTimeout(() => {
+    setBar('kelpBar', 10, true);
+    document.getElementById('kelpCard').classList.remove('healthy');
+    document.getElementById('kelpCard').classList.add('crashed');
+  }, 1400);
+  setTimeout(() => {
+    const status = document.getElementById('kelpStatus');
+    status.classList.remove('good');
+    status.classList.add('danger');
+    const lang = translations[currentLang];
+    status.innerHTML = (currentLang === 'en'
+      ? '<strong>⚠️ Trophic cascade!</strong> Without sea otters, sea urchin populations exploded. The urchins ate the kelp forest until only bare rocks remained — this is called an <em>urchin barren</em>. All the fish and animals that depended on the kelp forest lost their home. This is how one missing keystone species can destroy an entire ecosystem.'
+      : '<strong>⚠️ ¡Cascada trófica!</strong> Sin las nutrias marinas, las poblaciones de erizos explotaron. Los erizos se comieron el bosque de algas hasta que solo quedaron rocas desnudas — esto se llama <em>páramo de erizos</em>. Todos los peces y animales que dependían del bosque de algas perdieron su hogar. Así es como la pérdida de una sola especie clave puede destruir todo un ecosistema.');
+  }, 2100);
+}
+
+function resetKelp() {
+  setBar('otterBar', 85, false);
+  setBar('urchinBar', 30, false);
+  setBar('kelpBar', 90, false);
+  setBar('orcaBar', 80, false);
+  ['otterCard','urchinCard','kelpCard','orcaCard'].forEach(id => {
+    const card = document.getElementById(id);
+    card.classList.remove('crashed','booming');
+    card.classList.add('healthy');
+  });
+  const status = document.getElementById('kelpStatus');
+  status.classList.remove('danger');
+  status.classList.add('good');
+  status.innerHTML = '<strong data-i18n="statusHealthy"></strong><span data-i18n="kelpStatusHealthy"></span>';
+  applyLanguage();
+}
+
+// ==================== TIDAL POOL SIMULATOR ====================
+function removeStars() {
+  setBar('starBar', 0, true);
+  document.getElementById('starCard').classList.remove('healthy');
+  document.getElementById('starCard').classList.add('crashed');
+  setTimeout(() => {
+    setBar('musselBar', 95, true);
+    document.getElementById('musselCard').classList.remove('healthy');
+    document.getElementById('musselCard').classList.add('booming');
+  }, 700);
+  setTimeout(() => {
+    setBar('barnacleBar', 15, true);
+    setBar('snailBar', 10, true);
+    setBar('algaeBar', 10, true);
+    ['barnacleCard','snailCard','algaeCard'].forEach(id => {
+      const c = document.getElementById(id);
+      c.classList.remove('healthy');
+      c.classList.add('crashed');
+    });
+  }, 1400);
+  setTimeout(() => {
+    const status = document.getElementById('tidalStatus');
+    status.classList.remove('good');
+    status.classList.add('danger');
+    status.innerHTML = (currentLang === 'en'
+      ? '<strong>⚠️ Biodiversity crash!</strong> Without sea stars, mussels took over and covered the rocks. Barnacles, snails, and seaweeds had nowhere to grow. The number of species dropped from about 15 down to just a few. Dr. Paine proved that one single species — the sea star — was keeping the whole community alive. This is the original experiment that gave us the term "keystone species."'
+      : '<strong>⚠️ ¡Colapso de biodiversidad!</strong> Sin las estrellas de mar, los mejillones tomaron el control y cubrieron las rocas. Los percebes, caracoles y algas no tenían dónde crecer. El número de especies bajó de unas 15 a solo unas pocas. El Dr. Paine demostró que una sola especie — la estrella de mar — mantenía viva a toda la comunidad. Este es el experimento original que nos dio el término "especie clave".');
+  }, 2100);
+}
+
+function resetTidal() {
+  setBar('starBar', 80, false);
+  setBar('musselBar', 35, false);
+  setBar('barnacleBar', 70, false);
+  setBar('snailBar', 65, false);
+  setBar('algaeBar', 75, false);
+  ['starCard','musselCard','barnacleCard','snailCard','algaeCard'].forEach(id => {
+    const card = document.getElementById(id);
+    card.classList.remove('crashed','booming');
+    card.classList.add('healthy');
+  });
+  const status = document.getElementById('tidalStatus');
+  status.classList.remove('danger');
+  status.classList.add('good');
+  status.innerHTML = '<strong data-i18n="statusHealthy"></strong><span data-i18n="tidalStatusHealthy"></span>';
+  applyLanguage();
+}
+
+function setBar(id, pct, danger) {
+  const bar = document.getElementById(id);
+  bar.style.width = pct + '%';
+  if (danger) bar.classList.add('danger');
+  else bar.classList.remove('danger');
+}
+
+// ==================== LANGUAGE TOGGLE ====================
+function toggleLang() {
+  currentLang = (currentLang === 'en') ? 'es' : 'en';
+  applyLanguage();
+  renderQuestions();
+  renderGlossary();
+}
+
+function applyLanguage() {
+  const t = translations[currentLang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) {
+      el.innerHTML = t[key];
+    }
+  });
+  document.getElementById('langBtn').textContent = t.langBtn;
+  document.getElementById('glossBtn').textContent = t.glossBtn;
+  document.title = t.mainTitle;
+  document.documentElement.lang = currentLang;
+}
+
+// ==================== GLOSSARY ====================
+function toggleGlossary() {
+  document.getElementById('glossaryPanel').classList.toggle('open');
+}
+
+function renderGlossary() {
+  const body = document.getElementById('glossaryBody');
+  body.innerHTML = glossary.map(g => `
+    <div class="glossary-item" data-term="${g.term_en}">
+      <div class="glossary-term">${currentLang === 'en' ? g.term_en : g.term_es}</div>
+      <div class="glossary-def">${currentLang === 'en' ? g.def_en : g.def_es}</div>
+    </div>`).join('');
+}
+
+function highlightGlossary(term) {
+  document.getElementById('glossaryPanel').classList.add('open');
+  const items = document.querySelectorAll('.glossary-item');
+  items.forEach(item => {
+    if (item.getAttribute('data-term') === term) {
+      item.style.background = '#fef3c7';
+      item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { item.style.background = ''; }, 2200);
+    }
+  });
+}
+
+// ==================== QUESTIONS ====================
+function renderQuestions() {
+  const container = document.getElementById('questionsContainer');
+  const labels = ['A', 'B', 'C', 'D'];
+  container.innerHTML = questions.map((q, i) => {
+    const choices = currentLang === 'en' ? q.choices_en : q.choices_es;
+    const qText = currentLang === 'en' ? q.q_en : q.q_es;
+    return `
+      <div class="question-block">
+        <div class="q-number">${currentLang === 'en' ? 'Question' : 'Pregunta'} ${i+1}</div>
+        <div class="q-text">${qText}</div>
+        <div class="choices">
+          ${choices.map((c, ci) => `
+            <div class="choice ${studentAnswers[i] === ci ? 'selected' : ''}" onclick="selectChoice(${i}, ${ci})">
+              <input type="radio" name="q${i}" id="q${i}c${ci}" ${studentAnswers[i] === ci ? 'checked' : ''}>
+              <label for="q${i}c${ci}"><strong>${labels[ci]}.</strong> ${c}</label>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function selectChoice(qi, ci) {
+  studentAnswers[qi] = ci;
+  renderQuestions();
+}
+
+// ==================== COMPILE & COPY ====================
+function compileAnswers() {
+  const name = document.getElementById('studentName').value.trim() || '(Name not filled in)';
+  const essay = document.getElementById('essayAnswer').value.trim() || '(No essay written)';
+  const labels = ['A', 'B', 'C', 'D'];
+  const today = new Date().toLocaleDateString();
+
+  let out = '';
+  out += '========================================\n';
+  out += '  KEYSTONE SPECIES & TROPHIC CASCADES\n';
+  out += '  Concept Check — 10th Grade Biology\n';
+  out += '========================================\n\n';
+  out += 'Name: ' + name + '\n';
+  out += 'Date: ' + today + '\n\n';
+  out += '---- MULTIPLE CHOICE ANSWERS ----\n\n';
+
+  questions.forEach((q, i) => {
+    const qText = currentLang === 'en' ? q.q_en : q.q_es;
+    const chosen = studentAnswers[i];
+    const choices = currentLang === 'en' ? q.choices_en : q.choices_es;
+    out += (i+1) + '. ' + qText + '\n';
+    if (chosen === undefined) {
+      out += '   My answer: (not answered)\n\n';
+    } else {
+      out += '   My answer: ' + labels[chosen] + '. ' + choices[chosen] + '\n\n';
+    }
+  });
+
+  out += '---- ESSAY RESPONSE ----\n\n';
+  out += essay + '\n\n';
+  out += '========================================\n';
+  out += 'End of responses.\n';
+
+  const box = document.getElementById('compiledOutput');
+  box.textContent = out;
+  box.style.display = 'block';
+  document.getElementById('copyStatus').textContent = '';
+}
+
+function copyAnswers() {
+  const box = document.getElementById('compiledOutput');
+  if (box.style.display !== 'block' || !box.textContent.trim()) {
+    compileAnswers();
+  }
+  const text = document.getElementById('compiledOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById('copyStatus').textContent = currentLang === 'en'
+      ? '✓ Copied! Paste into Google Classroom.'
+      : '✓ ¡Copiado! Pégalo en Google Classroom.';
+    setTimeout(() => { document.getElementById('copyStatus').textContent = ''; }, 4000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    document.getElementById('copyStatus').textContent = currentLang === 'en'
+      ? '✓ Copied!'
+      : '✓ ¡Copiado!';
+    setTimeout(() => { document.getElementById('copyStatus').textContent = ''; }, 4000);
+  });
+}
+
+// Start
+init();
+</script>
+</body>
+</html>
