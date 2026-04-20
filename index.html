@@ -47,6 +47,19 @@
   .control-btn:hover { background: rgba(255,255,255,0.35); }
   .control-btn.active { background: #fbbf24; color: #78350f; border-color: #fbbf24; }
 
+  .logo-badge {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    height: 64px;
+    width: auto;
+    border-radius: 10px;
+    background: white;
+    padding: 4px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    border: 2px solid rgba(255,255,255,0.8);
+  }
+
   /* Nav tabs */
   .nav-tabs {
     display: flex;
@@ -404,6 +417,7 @@
   @media (max-width: 700px) {
     header h1 { font-size: 1.4rem; }
     .top-controls { position: static; justify-content: center; margin-top: 10px; }
+    .logo-badge { position: static; display: block; margin: 0 auto 10px; height: 54px; }
     .species-card { min-width: 90px; padding: 8px; }
     .species-emoji { font-size: 2rem; }
     .glossary-panel { width: calc(100% - 20px); right: 10px; }
@@ -414,6 +428,7 @@
 
 <div class="container">
   <header>
+    <img src="laughing-coyote-logo.jpg" class="logo-badge" alt="Laughing Coyote Education">
     <h1 id="mainTitle">Keystone Species &amp; Trophic Cascades</h1>
     <p id="mainSubtitle">10th Grade Biology — Interactive Lesson</p>
     <div class="top-controls">
